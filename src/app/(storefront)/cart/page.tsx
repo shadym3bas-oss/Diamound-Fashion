@@ -107,8 +107,10 @@ export default function CartPage() {
                             </div>
                         </CardContent>
                         <CardFooter className="flex-col gap-2">
-                             <Button size="lg" className="w-full">
-                                إتمام الطلب
+                             <Button asChild size="lg" className="w-full">
+                                <Link href="/checkout">
+                                    إتمام الطلب
+                                </Link>
                             </Button>
                             <Button variant="outline" className="w-full" onClick={clearCart}>
                                 إفراغ السلة
