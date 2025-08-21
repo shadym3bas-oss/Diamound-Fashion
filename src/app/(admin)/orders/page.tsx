@@ -3,12 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
 import { PlusCircle } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase-client";
+import { OrdersTable } from "./_components/orders-table";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function OrdersPage() {
@@ -25,7 +24,7 @@ export default function OrdersPage() {
         order_number,
         status,
         created_at,
-        customers (name),
+        customers (name, phone),
         order_items (price, quantity)
       `)
       .order("created_at", { ascending: false });
@@ -45,48 +44,22 @@ export default function OrdersPage() {
   useEffect(() => {
     loadOrders();
   }, []);
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "pending": return <Badge variant="outline">قيد الانتظار</Badge>;
-      case "confirmed": return <Badge className="bg-blue-500/10 text-blue-700">مؤكد</Badge>;
-      case "shipped": return <Badge className="bg-indigo-500/10 text-indigo-700">تم الشحن</Badge>;
-      case "delivered": return <Badge className="bg-emerald-500/10 text-emerald-700">تم التسليم</Badge>;
-      case "cancelled": return <Badge variant="destructive">ملغي</Badge>;
-      default: return <Badge variant="secondary">{status}</Badge>;
-    }
-  }
-
+  
   const TableSkeleton = () => (
-    <div className="overflow-x-auto">
-        <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>#</TableHead>
-                <TableHead>العميل</TableHead>
-                <TableHead>الإجمالي</TableHead>
-                <TableHead>الحالة</TableHead>
-                <TableHead>التاريخ</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-                {[...Array(5)].map((_, i) => (
-                    <TableRow key={i}>
-                      <TableCell><Skeleton className="h-5 w-20" /></TableCell>
-                      <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                      <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                      <TableCell><Skeleton className="h-6 w-20 rounded-full" /></TableCell>
-                      <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
+    <div className="overflow-x-auto p-4">
+        <div className="space-y-2">
+            <Skeleton className="h-8 w-[200px]" />
+            <Skeleton className="h-10 w-full" />
+             <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+        </div>
     </div>
   );
 
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4">
         <h1 className="text-2xl font-bold self-start">الطلبات</h1>
         <Link href="/orders/new">
           <Button className="w-full md:w-auto">
@@ -100,44 +73,8 @@ export default function OrdersPage() {
         <CardHeader>
           <CardTitle>قائمة الطلبات</CardTitle>
         </CardHeader>
-        <CardContent>
-          {isLoading ? <TableSkeleton /> : (
-            <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>رقم الطلب</TableHead>
-                  <TableHead>العميل</TableHead>
-                  <TableHead>الإجمالي</TableHead>
-                  <TableHead>الحالة</TableHead>
-                  <TableHead>التاريخ</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {orders.map((o) => (
-                  <TableRow key={o.id}>
-                    <TableCell className="font-mono">
-                      <Link href={`/orders/${o.id}`} className="hover:underline text-primary">
-                        #{o.order_number}
-                      </Link>
-                    </TableCell>
-                    <TableCell>{o.customers?.name ?? 'غير محدد'}</TableCell>
-                    <TableCell>{Number(o.total || 0).toFixed(2)} ج.م</TableCell>
-                    <TableCell>{getStatusBadge(o.status)}</TableCell>
-                    <TableCell>{new Date(o.created_at).toLocaleDateString('ar-EG')}</TableCell>
-                  </TableRow>
-                ))}
-                {orders.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                        لا توجد طلبات لعرضها.
-                      </TableCell>
-                    </TableRow>
-                )}
-              </TableBody>
-            </Table>
-            </div>
-          )}
+        <CardContent className="p-0">
+          {isLoading ? <TableSkeleton /> : <OrdersTable initialOrders={orders} />}
         </CardContent>
       </Card>
     </div>

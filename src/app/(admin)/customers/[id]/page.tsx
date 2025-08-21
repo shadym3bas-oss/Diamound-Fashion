@@ -12,8 +12,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast";
 import { deleteCustomer } from "./actions";
 import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 
-export default function CustomerDetailsPage({ params }: { params: { id: string } }) {
+export default function CustomerDetailsPage() {
+  const params = useParams();
+  const id = params.id as string;
   const [customer, setCustomer] = useState<any>(null);
   const [ordersList, setOrdersList] = useState<any[]>([]);
   const [totalPurchases, setTotalPurchases] = useState(0);
@@ -23,8 +26,9 @@ export default function CustomerDetailsPage({ params }: { params: { id: string }
 
   useEffect(() => {
     async function loadData() {
+      if (!id) return;
       setLoading(true);
-      const { data: customerData } = await supabase.from("customers").select("*").eq("id", params.id).single();
+      const { data: customerData } = await supabase.from("customers").select("*").eq("id", id).single();
       
       if (!customerData) {
         setLoading(false);
@@ -47,7 +51,7 @@ export default function CustomerDetailsPage({ params }: { params: { id: string }
       setLoading(false);
     }
     loadData();
-  }, [params.id]);
+  }, [id]);
 
   if (loading) {
       return <div>جاري التحميل...</div>
