@@ -37,7 +37,7 @@ function StorefrontHeader() {
               )}
             </Link>
           </Button>
-          <Button asChild variant="outline" className="hidden md:flex">
+          <Button asChild variant="outline">
             <Link href="/login">
               دخول المسؤول
             </Link>
