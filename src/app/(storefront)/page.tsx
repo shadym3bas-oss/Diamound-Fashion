@@ -30,7 +30,7 @@ export default function StorefrontPage() {
         .from('products')
         .select('*')
         .gt('stock', 0)
-        .order('created_at', { ascending: false });
+        .order('name', { ascending: true });
 
       if (error) {
         console.error("Error fetching products for storefront:", JSON.stringify(error, null, 2));
