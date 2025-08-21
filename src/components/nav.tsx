@@ -18,7 +18,7 @@ import { useSidebar } from "@/components/ui/sidebar";
 
 
 const links = [
-  { href: "/", label: "لوحة التحكم", icon: LayoutDashboard },
+  { href: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard },
   { href: "/orders", label: "الطلبات", icon: ShoppingCart },
   { href: "/customers", label: "العملاء", icon: Users },
   { href: "/products", label: "المنتجات", icon: Package },

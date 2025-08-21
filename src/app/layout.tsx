@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Cairo } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import AuthGuard from '@/components/auth-guard';
 
 
 const cairo = Cairo({
@@ -13,7 +12,7 @@ const cairo = Cairo({
 
 export const metadata: Metadata = {
   title: 'Diamond Fashion',
-  description: 'Factory ERP',
+  description: 'Factory ERP & Storefront',
 };
 
 export default function RootLayout({
@@ -24,9 +23,7 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl">
       <body className={cairo.className}>
-        <AuthGuard>
-          {children}
-        </AuthGuard>
+        {children}
         <Toaster />
       </body>
     </html>

@@ -11,18 +11,23 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
+    // This effect should only run on the client side
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     const auth = localStorage.getItem("auth");
     
-    // If not authenticated and not on login page, redirect to login
-    if (auth !== "true" && pathname !== "/login") {
+    // Allow access to login page regardless of auth state
+    if (pathname.startsWith("/login")) {
+      setIsChecking(false);
+      return;
+    }
+    
+    // If not authenticated, redirect to login
+    if (auth !== "true") {
       router.replace("/login");
-    } 
-    // If authenticated and on login page, redirect to home
-    else if (auth === "true" && pathname === "/login") {
-      router.replace("/");
-    } 
-    // Otherwise, stop checking
-    else {
+    } else {
       setIsChecking(false);
     }
   }, [pathname, router]);

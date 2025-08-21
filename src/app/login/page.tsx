@@ -27,7 +27,7 @@ export default function LoginPage() {
                     title: "تم تسجيل الدخول بنجاح!",
                     description: "جاري توجيهك إلى لوحة التحكم.",
                 });
-                router.push("/");
+                router.push("/dashboard");
             } else {
                 toast({
                     variant: "destructive",
