@@ -24,7 +24,7 @@ export default function OrdersPage() {
         order_number,
         status,
         created_at,
-        customers (name, phone),
+        customer:customers (name, phone),
         order_items (price, quantity)
       `)
       .order("created_at", { ascending: false });

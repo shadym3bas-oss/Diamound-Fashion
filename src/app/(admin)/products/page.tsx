@@ -26,7 +26,7 @@ export default function ProductsPage() {
 
   async function fetchProducts() {
     setIsLoading(true);
-    const { data, error } = await supabase.from("products").select("*").order("name");
+    const { data, error } = await supabase.from("products").select("id, name, price, stock, image_urls").order("name");
     if (error) {
       console.error(error);
     } else {

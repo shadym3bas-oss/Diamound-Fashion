@@ -19,7 +19,7 @@ export default function CustomersPage() {
 
   async function load() {
     setIsLoading(true);
-    const { data, error } = await supabase.from("customers").select("*").order("name");
+    const { data, error } = await supabase.from("customers").select("id, name, phone, email").order("name");
     if (error) {
       toast({ variant: "destructive", title: "خطأ", description: error.message });
     } else {

@@ -67,7 +67,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
   const getWhatsappMessage = (order: any) => {
     const template = whatsappTemplates[order.status] || "مرحباً، طلبك رقم #{order_number} حالته الآن: {status_translated}";
     return template
-        .replace('{customer_name}', order.customers?.name || 'عميلنا العزيز')
+        .replace('{customer_name}', order.customer?.name || 'عميلنا العزيز')
         .replace('{order_number}', order.order_number)
   }
 
@@ -166,7 +166,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                             #{o.order_number}
                         </Link>
                       </TableCell>
-                      <TableCell>{o.customers?.name ?? 'غير محدد'}</TableCell>
+                      <TableCell>{o.customer?.name ?? 'غير محدد'}</TableCell>
                        <TableCell>{Number(o.total || 0).toFixed(2)} ج.م</TableCell>
                       <TableCell>
                         <DropdownMenu>
@@ -195,7 +195,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                               <DropdownMenuItem asChild><Link href={`/orders/${o.id}`}>عرض التفاصيل</Link></DropdownMenuItem>
                               <DropdownMenuItem asChild><Link href={`/orders/${o.id}/invoice`} target="_blank">طباعة الفاتورة</Link></DropdownMenuItem>
                               <DropdownMenuItem asChild>
-                                <a href={waUrl(o.customers?.phone, getWhatsappMessage(o))} target="_blank" rel="noopener noreferrer">
+                                <a href={waUrl(o.customer?.phone, getWhatsappMessage(o))} target="_blank" rel="noopener noreferrer">
                                   إرسال واتساب
                                 </a>
                               </DropdownMenuItem>

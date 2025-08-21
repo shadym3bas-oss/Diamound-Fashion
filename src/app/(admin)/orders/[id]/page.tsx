@@ -33,7 +33,7 @@ export default function OrderDetails() {
     setIsLoading(true);
     const { data, error } = await supabase
       .from("orders")
-      .select("*, customers(name, phone, address), order_items(id, quantity, price, products(name, price))")
+      .select("*, customer:customers(name, phone, address), order_items(*, product:products(name, price))")
       .eq("id", id)
       .single();
 
@@ -154,7 +154,7 @@ export default function OrderDetails() {
               {order.order_items.map((item: any, i: number) => (
                 <li key={i} className="flex justify-between items-center text-sm">
                   <span className="font-medium">
-                    {item.products?.name || `منتج محذوف (${item.id})`}
+                    {item.product?.name || `منتج محذوف (${item.id})`}
                   </span>
                   <span className="text-muted-foreground text-sm">
                     {item.quantity} × {Number(item.price).toFixed(2)} ج.م
@@ -177,9 +177,9 @@ export default function OrderDetails() {
                   <CardTitle>بيانات العميل</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
-                  <p><span className="font-semibold text-foreground">العميل:</span> {order.customers.name}</p>
-                  <p><span className="font-semibold text-foreground">الهاتف:</span> {order.customers.phone}</p>
-                   <p><span className="font-semibold text-foreground">العنوان:</span> {order.customers.address || 'غير محدد'}</p>
+                  <p><span className="font-semibold text-foreground">العميل:</span> {order.customer.name}</p>
+                  <p><span className="font-semibold text-foreground">الهاتف:</span> {order.customer.phone}</p>
+                   <p><span className="font-semibold text-foreground">العنوان:</span> {order.customer.address || 'غير محدد'}</p>
                    <Button asChild variant="link" className="p-0 h-auto">
                     <Link href={`/customers/${order.customer_id}`}>عرض سجل العميل</Link>
                    </Button>

@@ -122,8 +122,8 @@ export default function ProductDetailsPage() {
                                     </CarouselItem>
                                 ))}
                             </CarouselContent>
-                            <CarouselPrevious className="-right-12" />
-                            <CarouselNext className="-left-12" />
+                            <CarouselPrevious className="right-12" />
+                            <CarouselNext className="left-12" />
                         </Carousel>
                     ) : (
                         <div className="relative aspect-square">

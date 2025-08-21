@@ -13,6 +13,8 @@ export type Product = {
   sku: string;
   price: number;
   stock: number;
+  image_urls: string[];
+  colors: string[];
   created_at: string;
 };
 
@@ -22,7 +24,7 @@ export type Order = {
   customer_id: string;
   status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
   created_at: string;
-  customers: {
+  customer: {
       name: string;
       phone?: string | null;
   } | null;

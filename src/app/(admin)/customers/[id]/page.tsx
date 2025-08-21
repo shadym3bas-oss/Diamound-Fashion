@@ -11,8 +11,7 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { deleteCustomer } from "./actions";
-import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 
 export default function CustomerDetailsPage() {
   const params = useParams();
@@ -38,7 +37,7 @@ export default function CustomerDetailsPage() {
 
       const { data: ordersData } = await supabase
         .from("orders")
-        .select("*, order_items(price, quantity)")
+        .select("id, order_number, created_at, status, order_items(price, quantity)")
         .eq("customer_id", customerData.id)
         .order("created_at", { ascending: false });
 

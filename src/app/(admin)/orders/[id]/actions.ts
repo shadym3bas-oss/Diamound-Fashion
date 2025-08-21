@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 const UpdateStatusSchema = z.object({
-    id: z.string(),
+    id: z.string().uuid(),
     status: z.enum(["pending", "confirmed", "shipped", "delivered", "cancelled"])
 });
 
