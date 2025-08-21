@@ -1,116 +1,104 @@
 
-import { getSupabaseAdmin } from "@/lib/supabase-client";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Printer } from "lucide-react";
-import { OrderStatusActions } from "./_components/order-status-actions";
+"use client";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { supabase } from "@/lib/supabase-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
 
-export default async function OrderDetails({ params }: { params: { id: string } }) {
-  const supabase = getSupabaseAdmin();
-  const { data: order } = await supabase.from("orders").select("*, customers(name, phone)").eq("id", params.id).single();
-  
-  if (!order) return <div className="p-6">الطلب غير موجود</div>;
-  
-  const { data: items } = await supabase.from("order_items").select("*, product:products(name)").eq("order_id", order.id);
+export default function OrderDetails() {
+  const { id } = useParams();
+  const [order, setOrder] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const itemsList = items || [];
-  const totalRevenue = itemsList.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  useEffect(() => {
+    if (id) {
+        fetchOrder();
+    }
+  }, [id]);
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "pending": return <Badge variant="outline">قيد الانتظار</Badge>;
-      case "confirmed": return <Badge className="bg-blue-500/10 text-blue-700">مؤكد</Badge>;
-      case "shipped": return <Badge className="bg-indigo-500/10 text-indigo-700">تم الشحن</Badge>;
-      case "delivered": return <Badge className="bg-emerald-500/10 text-emerald-700">تم التسليم</Badge>;
-      case "cancelled": return <Badge variant="destructive">ملغي</Badge>;
-      default: return <Badge variant="secondary">{status}</Badge>;
+  async function fetchOrder() {
+    setIsLoading(true);
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*, customers(name, phone), order_items(quantity, products(name, price))")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+        console.error(error);
+        setIsLoading(false);
+    } else {
+        const orderTotal = data.order_items.reduce((sum: number, item: any) => sum + (item.products.price * item.quantity), 0);
+        setOrder({...data, total_amount: orderTotal});
+        setIsLoading(false);
     }
   }
 
+  if (isLoading) {
+    return (
+        <div className="space-y-6">
+            <Skeleton className="h-8 w-1/2" />
+            <div className="space-y-2">
+                <Skeleton className="h-5 w-1/3" />
+                <Skeleton className="h-5 w-1/4" />
+            </div>
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-6 w-1/4" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <Skeleton className="h-5 w-full" />
+                    <Skeleton className="h-5 w-full" />
+                </CardContent>
+            </Card>
+            <div className="text-right">
+                <Skeleton className="h-7 w-1/4" />
+            </div>
+        </div>
+    );
+  }
+
+  if (!order) return <p className="text-center text-muted-foreground">لم يتم العثور على الطلب.</p>;
+
   return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">تفاصيل الطلب #{order.order_number}</h1>
-          <Button asChild variant="outline">
-            <Link href={`/orders/${order.id}/invoice`} target="_blank">
-              <Printer className="ml-2 h-4 w-4" />
-              طباعة الفاتورة
-            </Link>
-          </Button>
-        </div>
-
-        <Card>
-            <CardHeader>
-                <CardTitle>تغيير حالة الطلب</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <OrderStatusActions order={order} />
-            </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader><CardTitle>العميل</CardTitle></CardHeader>
-            <CardContent>
-                <Link href={`/customers/${order.customer_id}`} className="text-primary hover:underline font-medium">
-                <div>{order.customers?.name}</div>
-                </Link>
-                <div className="text-muted-foreground">{order.customers?.phone ?? "-"}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle>ملخص الطلب</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
-                <div>الحالة: {getStatusBadge(order.status)}</div>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm pt-2 border-t">
-                    <span className="text-gray-700 font-bold text-base">إجمالي البيع:</span>
-                    <span className="font-bold text-base text-right">{totalRevenue.toFixed(2)} ج.م</span>
-                </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle>تاريخ الطلب</CardTitle></CardHeader>
-            <CardContent>
-                <ol className="relative border-s border-gray-200 pr-4 space-y-3">
-                     <li className="relative pr-5">
-                        <span className="absolute right-0 top-1.5 size-2 rounded-full bg-primary"></span>
-                        <div className="text-sm font-medium">تم إنشاء الطلب</div>
-                        <div className="text-xs text-gray-500">{new Date(order.created_at).toLocaleString("ar-EG", {dateStyle: 'short', timeStyle: 'short'})}</div>
-                    </li>
-                </ol>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card>
-            <CardHeader><CardTitle>المنتجات المطلوبة</CardTitle></CardHeader>
-            <CardContent>
-                <Table>
-                <TableHeader>
-                    <TableRow>
-                    <TableHead>المنتج</TableHead>
-                    <TableHead>الكمية</TableHead>
-                    <TableHead>سعر الوحدة</TableHead>
-                    <TableHead>الإجمالي</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {itemsList.map((it: any, i: number) => (
-                    <tr key={i} className="border-b odd:bg-white even:bg-secondary/50">
-                        <td className="p-3">{it.product?.name}</td>
-                        <td className="p-3">{it.quantity}</td>
-                        <td className="p-3">{Number(it.price).toFixed(2)}</td>
-                        <td className="p-3 font-medium">{Number(it.price * it.quantity).toFixed(2)}</td>
-                    </tr>
-                    ))}
-                </TableBody>
-                </Table>
-            </CardContent>
-        </Card>
-
-      </div>
+    <div className="space-y-6">
+      <h1 className="text-3xl font-extrabold">تفاصيل الطلب #{order.order_number}</h1>
+      
+      <Card>
+        <CardHeader>
+            <CardTitle>بيانات العميل</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-1 text-muted-foreground">
+            <p><span className="font-semibold text-foreground">العميل:</span> {order.customers.name}</p>
+            <p><span className="font-semibold text-foreground">الهاتف:</span> {order.customers.phone}</p>
+        </CardContent>
+      </Card>
+      
+      <Card>
+          <CardHeader>
+              <CardTitle>المنتجات المطلوبة</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-3">
+              {order.order_items.map((item: any, i: number) => (
+                <li key={i} className="flex justify-between items-center">
+                  <span>
+                    {item.products.name}
+                  </span>
+                  <span className="text-muted-foreground text-sm">
+                    {item.quantity} × {Number(item.products.price).toFixed(2)} ج.م
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <Separator className="my-4" />
+            <div className="flex justify-end font-bold text-lg">
+                <p>الإجمالي: {Number(order.total_amount).toFixed(2)} ج.م</p>
+            </div>
+          </CardContent>
+      </Card>
+    </div>
   );
 }
