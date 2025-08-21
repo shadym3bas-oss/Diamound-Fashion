@@ -1,13 +1,13 @@
 
 "use client";
 
-import { getSupabaseAdmin } from '@/lib/supabase-client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase-client';
 import { useEffect, useState } from 'react';
+import { useCart } from '@/context/cart-context';
 
 type Product = {
   id: string;
@@ -16,11 +16,13 @@ type Product = {
   price: number | null;
   image_url: string | null;
   stock: number;
+  sku: string;
 };
 
 export default function StorefrontPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const { toast } = useToast();
+  const { addToCart } = useCart();
 
   useEffect(() => {
     async function fetchProducts() {
@@ -43,10 +45,11 @@ export default function StorefrontPage() {
     return <p className="text-center p-8">جاري تحميل المنتجات...</p>;
   }
 
-  const handleAddToCart = (productName: string) => {
+  const handleAddToCart = (product: Product) => {
+    addToCart(product, 1);
     toast({
       title: "تمت الإضافة بنجاح!",
-      description: `تمت إضافة "${productName}" إلى السلة.`,
+      description: `تمت إضافة "${product.name}" إلى السلة.`,
     });
   };
 
@@ -81,7 +84,7 @@ export default function StorefrontPage() {
                     <p className="text-muted-foreground text-sm mt-1 flex-grow">{p.description || "وصف المنتج هنا..."}</p>
                     <div className="flex justify-between items-center mt-4">
                       <span className="text-xl font-bold text-primary">{Number(p.price).toFixed(2)} ج.م</span>
-                      <Button onClick={() => handleAddToCart(p.name)} disabled={p.stock === 0}>
+                      <Button onClick={() => handleAddToCart(p)} disabled={p.stock === 0}>
                         أضف للسلة
                       </Button>
                     </div>

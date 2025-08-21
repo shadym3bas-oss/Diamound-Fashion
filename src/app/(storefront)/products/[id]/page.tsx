@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useParams } from "next/navigation";
-
+import { useCart } from "@/context/cart-context";
 
 type Product = {
   id: string;
@@ -28,6 +28,7 @@ export default function ProductDetailsPage() {
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
+    const { addToCart } = useCart();
 
     useEffect(() => {
         if (!id) return;
@@ -69,6 +70,7 @@ export default function ProductDetailsPage() {
     }
     
     const handleAddToCart = () => {
+        addToCart(product, 1);
         toast({
             title: "تمت الإضافة بنجاح!",
             description: `تمت إضافة "${product.name}" إلى السلة.`,
@@ -112,4 +114,3 @@ export default function ProductDetailsPage() {
         </div>
     );
 }
-
