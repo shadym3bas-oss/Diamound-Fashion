@@ -40,7 +40,7 @@ export default function CustomerDetailsPage({ params }: { params: { id: string }
 
       const orders = (ordersData || []).map(o => ({
           ...o,
-          total: o.order_items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+          total: o.order_items.reduce((sum: number, item: {price: number, quantity: number}) => sum + (item.price * item.quantity), 0)
       }));
       setOrdersList(orders);
       setTotalPurchases(orders.reduce((acc, order) => acc + (order.total || 0), 0));
@@ -171,7 +171,7 @@ export default function CustomerDetailsPage({ params }: { params: { id: string }
                         ))}
                         {ordersList.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
                                     لا توجد طلبات لهذا العميل.
                                 </TableCell>
                             </TableRow>

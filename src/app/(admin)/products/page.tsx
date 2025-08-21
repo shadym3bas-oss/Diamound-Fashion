@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { Edit, PlusCircle, Search, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -73,7 +73,7 @@ export default function ProductsPage() {
         title: "نجاح!",
         description: "تم حذف المنتج بنجاح.",
       });
-      router.refresh();
+      load();
     }
   }
 
