@@ -14,9 +14,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { addProduct } from "../actions";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   name: z.string().min(2, "اسم المنتج مطلوب"),
+  description: z.string().optional(),
+  image_url: z.string().url("يجب أن يكون رابطًا صالحًا").optional().or(z.literal('')),
   price: z.coerce.number().min(0, "السعر لا يمكن أن يكون سالبًا"),
   stock: z.coerce.number().min(0, "المخزون لا يمكن أن يكون سالبًا").default(0),
 });
@@ -27,6 +30,8 @@ export function ProductForm({ onSuccess }: { onSuccess?: () => void }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      description: "",
+      image_url: "",
       price: 0,
       stock: 0,
     },
@@ -63,6 +68,32 @@ export function ProductForm({ onSuccess }: { onSuccess?: () => void }) {
               <FormLabel>اسم المنتج</FormLabel>
               <FormControl>
                 <Input placeholder="مثال: فستان سهرة" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+         <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>الوصف</FormLabel>
+              <FormControl>
+                <Textarea placeholder="وصف تفصيلي للمنتج..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+         <FormField
+          control={form.control}
+          name="image_url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>رابط الصورة</FormLabel>
+              <FormControl>
+                <Input placeholder="https://example.com/image.png" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

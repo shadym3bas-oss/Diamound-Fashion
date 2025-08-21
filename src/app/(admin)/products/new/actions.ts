@@ -6,6 +6,8 @@ import { z } from "zod";
 
 const ProductSchema = z.object({
   name: z.string(),
+  description: z.string().optional(),
+  image_url: z.string().url().optional().or(z.literal('')),
   price: z.number(),
   stock: z.number(),
 });
@@ -15,7 +17,9 @@ export async function addProduct(values: z.infer<typeof ProductSchema>) {
     const { data, error } = await supabase
         .from("products")
         .insert([{ 
-            name: values.name, 
+            name: values.name,
+            description: values.description,
+            image_url: values.image_url || null,
             price: values.price,
             stock: values.stock,
         }])

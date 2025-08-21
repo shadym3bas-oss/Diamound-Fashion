@@ -1,4 +1,3 @@
-
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase-client";
@@ -6,6 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from 'next/image';
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { PlusCircle } from "lucide-react";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -53,7 +55,15 @@ export default function ProductsPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold self-start">المنتجات</h1>
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold self-start">المنتجات</h1>
+        <Link href="/products/new">
+          <Button className="w-full md:w-auto">
+            <PlusCircle className="ml-2 h-4 w-4" />
+            إضافة منتج جديد
+          </Button>
+        </Link>
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>قائمة المنتجات</CardTitle>
@@ -75,7 +85,7 @@ export default function ProductsPage() {
                     <TableRow key={p.id}>
                       <TableCell>
                         <Image 
-                            src={`https://placehold.co/64x64.png`} 
+                            src={p.image_url || `https://placehold.co/64x64.png`} 
                             alt={p.name} 
                             width={64} 
                             height={64} 
