@@ -1,3 +1,4 @@
+
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase-client";
@@ -7,11 +8,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { PlusCircle } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Trash2 } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { deleteProduct } from "./actions";
+import { Badge } from "@/components/ui/badge";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchProducts();
@@ -27,6 +34,33 @@ export default function ProductsPage() {
     }
     setIsLoading(false);
   }
+  
+  async function handleDelete(productId: string) {
+      const result = await deleteProduct(productId);
+      if (result.error) {
+          toast({
+              variant: "destructive",
+              title: "حدث خطأ",
+              description: "لا يمكن حذف المنتج لأنه مرتبط بطلبات. يجب حذف الطلبات المرتبطة به أولاً.",
+          })
+      } else {
+          toast({
+              title: "نجاح",
+              description: "تم حذف المنتج بنجاح."
+          });
+          fetchProducts();
+      }
+  }
+
+  const getStockBadge = (stock: number) => {
+      if (stock === 0) {
+          return <Badge variant="destructive">نفدت الكمية</Badge>
+      }
+      if (stock < 5) {
+          return <Badge variant="outline" className="text-amber-600 border-amber-500">مخزون منخفض</Badge>
+      }
+      return <Badge variant="secondary">{stock}</Badge>
+  }
 
   const TableSkeleton = () => (
     <div className="overflow-x-auto">
@@ -37,15 +71,17 @@ export default function ProductsPage() {
                 <TableHead>الاسم</TableHead>
                 <TableHead>السعر</TableHead>
                 <TableHead>الكمية</TableHead>
+                <TableHead><span className="sr-only">إجراءات</span></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
                 {[...Array(5)].map((_, i) => (
                     <TableRow key={i}>
-                      <TableCell><Skeleton className="h-16 w-16" /></TableCell>
+                      <TableCell><Skeleton className="h-16 w-16 rounded-md" /></TableCell>
                       <TableCell><Skeleton className="h-5 w-32" /></TableCell>
                       <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                       <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                       <TableCell><Skeleton className="h-8 w-8" /></TableCell>
                     </TableRow>
                 ))}
             </TableBody>
@@ -78,6 +114,7 @@ export default function ProductsPage() {
                     <TableHead>الاسم</TableHead>
                     <TableHead>السعر</TableHead>
                     <TableHead>الكمية</TableHead>
+                    <TableHead className="text-left">إجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -89,18 +126,49 @@ export default function ProductsPage() {
                             alt={p.name} 
                             width={64} 
                             height={64} 
-                            className="rounded-md object-cover"
+                            className="rounded-md object-cover border"
                             data-ai-hint="fashion clothing"
                         />
                       </TableCell>
                       <TableCell className="font-medium">{p.name}</TableCell>
                       <TableCell>{Number(p.price).toFixed(2)} ج.م</TableCell>
-                      <TableCell>{p.stock}</TableCell>
+                      <TableCell>{getStockBadge(p.stock)}</TableCell>
+                       <TableCell className="text-left">
+                          <AlertDialog>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <AlertDialogTrigger asChild>
+                                  <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+                                    <Trash2 className="ml-2 h-4 w-4" />
+                                    حذف المنتج
+                                  </DropdownMenuItem>
+                                </AlertDialogTrigger>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>هل أنت متأكد من حذف المنتج؟</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    هذا الإجراء سيقوم بحذف المنتج بشكل دائم. لا يمكن التراجع عن هذا الإجراء.
+                                </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDelete(p.id)}>نعم، قم بالحذف</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                       </TableCell>
                     </TableRow>
                   ))}
                   {products.length === 0 && (
                     <TableRow>
-                        <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                        <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                             لا توجد منتجات لعرضها.
                         </TableCell>
                     </TableRow>

@@ -28,6 +28,7 @@ import { Textarea } from "@/components/ui/textarea";
 const formSchema = z.object({
   order_id: z.string({required_error: "يجب اختيار طلب"}).uuid("يجب اختيار طلب صالح"),
   items: z.array(z.object({
+    order_item_id: z.string().uuid(),
     product_id: z.string().uuid(),
     quantity: z.coerce.number().min(1, "الكمية المرتجعة يجب أن تكون 1 على الأقل"),
   })).min(1, "يجب إرجاع منتج واحد على الأقل"),
@@ -43,7 +44,7 @@ type OrderItem = {
     product_id: string;
     quantity: number;
     price: number;
-    product: { name: string; } | null
+    products: { name: string; } | null
 }
 
 export function ReturnForm({ orders }: ReturnFormProps) {
@@ -93,6 +94,7 @@ export function ReturnForm({ orders }: ReturnFormProps) {
             const orderItem = orderItems.find(i => i.id === itemId);
             if (orderItem) {
                 newFormItems.push({
+                    order_item_id: orderItem.id,
                     product_id: orderItem.product_id,
                     quantity: 1, // Default to 1
                 });
@@ -168,7 +170,7 @@ export function ReturnForm({ orders }: ReturnFormProps) {
                                                 onCheckedChange={(checked) => handleItemSelection(item.id, !!checked)}
                                             />
                                         </TableCell>
-                                        <TableCell>{item.product?.name}</TableCell>
+                                        <TableCell>{item.products?.name}</TableCell>
                                         <TableCell>{item.quantity}</TableCell>
                                     </TableRow>
                                 ))}
@@ -195,7 +197,7 @@ export function ReturnForm({ orders }: ReturnFormProps) {
                                     const orderItem = orderItems.find(i => i.product_id === field.product_id);
                                     return (
                                         <TableRow key={index}>
-                                            <TableCell>{orderItem?.product?.name}</TableCell>
+                                            <TableCell>{orderItem?.products?.name}</TableCell>
                                             <TableCell>
                                                 <FormField
                                                     control={form.control}
