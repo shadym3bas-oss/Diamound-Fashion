@@ -1,3 +1,4 @@
+
 "use client";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,12 +18,18 @@ import { addProduct } from "../actions";
 import { Textarea } from "@/components/ui/textarea";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+
+const PREDEFINED_COLORS = [
+  "Black", "White", "Red", "Blue", "Green", "Yellow", 
+  "Purple", "Orange", "Pink", "Brown", "Gray", "Silver", "Gold"
+];
 
 const formSchema = z.object({
   name: z.string().min(2, "اسم المنتج مطلوب"),
   description: z.string().optional(),
   image_urls: z.array(z.object({ value: z.string().url("يجب أن يكون رابطًا صالحًا") })).min(1, "يجب إضافة رابط صورة واحد على الأقل"),
-  colors: z.string().optional(), // Comma-separated string
+  colors: z.array(z.string()).optional(),
   price: z.coerce.number().min(0, "السعر لا يمكن أن يكون سالبًا"),
   stock: z.coerce.number().min(0, "المخزون لا يمكن أن يكون سالبًا").default(0),
 });
@@ -35,7 +42,7 @@ export function ProductForm({ onSuccess }: { onSuccess?: () => void }) {
       name: "",
       description: "",
       image_urls: [{ value: "" }],
-      colors: "",
+      colors: [],
       price: 0,
       stock: 0,
     },
@@ -45,6 +52,16 @@ export function ProductForm({ onSuccess }: { onSuccess?: () => void }) {
     control: form.control,
     name: "image_urls",
   });
+
+  const selectedColors = form.watch("colors") || [];
+
+  const handleColorToggle = (color: string) => {
+    const currentColors = form.getValues("colors") || [];
+    const newColors = currentColors.includes(color)
+      ? currentColors.filter((c) => c !== color)
+      : [...currentColors, color];
+    form.setValue("colors", newColors, { shouldValidate: true });
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const result = await addProduct(values);
@@ -68,7 +85,7 @@ export function ProductForm({ onSuccess }: { onSuccess?: () => void }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="name"
@@ -98,25 +115,27 @@ export function ProductForm({ onSuccess }: { onSuccess?: () => void }) {
         
         <div>
           <Label>روابط الصور</Label>
-          {fields.map((field, index) => (
-            <div key={field.id} className="flex items-center gap-2 mt-2">
-              <FormField
-                control={form.control}
-                name={`image_urls.${index}.value`}
-                render={({ field }) => (
-                  <FormItem className="flex-grow">
-                    <FormControl>
-                      <Input placeholder={`https://example.com/image-${index + 1}.png`} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)} disabled={fields.length <= 1}>
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
+          <div className="space-y-2">
+            {fields.map((field, index) => (
+              <div key={field.id} className="flex items-center gap-2">
+                <FormField
+                  control={form.control}
+                  name={`image_urls.${index}.value`}
+                  render={({ field }) => (
+                    <FormItem className="flex-grow">
+                      <FormControl>
+                        <Input placeholder={`https://example.com/image-${index + 1}.png`} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)} disabled={fields.length <= 1}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
            <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => append({ value: "" })}>
             <PlusCircle className="mr-2 h-4 w-4" />
             إضافة صورة أخرى
@@ -126,11 +145,29 @@ export function ProductForm({ onSuccess }: { onSuccess?: () => void }) {
         <FormField
           control={form.control}
           name="colors"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
               <FormLabel>الألوان المتاحة</FormLabel>
               <FormControl>
-                <Input placeholder="أحمر, أزرق, أسود" {...field} />
+                <div className="flex flex-wrap gap-3 p-3 border rounded-lg bg-background">
+                  {PREDEFINED_COLORS.map((color) => (
+                    <button
+                      type="button"
+                      key={color}
+                      onClick={() => handleColorToggle(color)}
+                      className={cn(
+                        "h-8 w-8 rounded-full border-2 transition-transform hover:scale-110",
+                        selectedColors.includes(color)
+                          ? "border-primary ring-2 ring-primary ring-offset-2"
+                          : "border-gray-200"
+                      )}
+                      style={{ backgroundColor: color }}
+                      title={color}
+                    >
+                      <span className="sr-only">{color}</span>
+                    </button>
+                  ))}
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
