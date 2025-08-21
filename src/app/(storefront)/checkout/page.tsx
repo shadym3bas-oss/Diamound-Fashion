@@ -22,6 +22,7 @@ import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { createOrder } from "./actions";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const formSchema = z.object({
   name: z.string().min(2, "الاسم مطلوب"),
@@ -33,6 +34,11 @@ export default function CheckoutPage() {
     const { cartItems, clearCart } = useCart();
     const { toast } = useToast();
     const router = useRouter();
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -80,7 +86,7 @@ export default function CheckoutPage() {
         }
     }
 
-     if (cartItems.length === 0 && !form.formState.isSubmitting) {
+     if (isClient && cartItems.length === 0 && !form.formState.isSubmitting) {
         return (
              <div className="container mx-auto px-6 py-10 text-center">
                 <h1 className="text-2xl font-bold">لا يوجد شيء لإتمام طلبه</h1>
