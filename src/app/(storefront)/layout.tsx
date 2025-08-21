@@ -6,9 +6,16 @@ import { Gem, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CartProvider, useCart } from '@/context/cart-context';
 import { Badge } from '@/components/ui/badge';
+import { useEffect, useState } from 'react';
 
 function StorefrontHeader() {
   const { cartItems } = useCart();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -25,7 +32,7 @@ function StorefrontHeader() {
             <Link href="/cart" className='relative'>
               <ShoppingCart className="ml-2 h-4 w-4" />
               <span>السلة</span>
-              {itemCount > 0 && (
+              {isClient && itemCount > 0 && (
                 <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0">{itemCount}</Badge>
               )}
             </Link>
@@ -54,7 +61,7 @@ export default function StorefrontLayout({
         <main className="flex-grow">{children}</main>
         <footer className="bg-card text-muted-foreground py-6 mt-10 border-t">
           <div className="container mx-auto px-6 text-center">
-            <p>© {new Date().getFullYear()} Diamond Fashion. جميع الحقوق محفوظة.</p>
+            <p>© 2024 Diamond Fashion. جميع الحقوق محفوظة.</p>
           </div>
         </footer>
       </div>
