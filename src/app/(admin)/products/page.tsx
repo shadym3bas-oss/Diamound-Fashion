@@ -85,7 +85,7 @@ export default function ProductsPage() {
                     <TableRow key={p.id}>
                       <TableCell>
                         <Image 
-                            src={p.image_url || `https://placehold.co/64x64.png`} 
+                            src={p.image_urls?.[0] || `https://placehold.co/64x64.png`} 
                             alt={p.name} 
                             width={64} 
                             height={64} 

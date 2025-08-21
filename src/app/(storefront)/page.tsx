@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from 'next/image';
@@ -14,7 +13,7 @@ type Product = {
   name: string;
   description: string | null;
   price: number | null;
-  image_url: string | null;
+  image_urls: string[] | null;
   stock: number;
   sku: string;
 };
@@ -69,7 +68,7 @@ export default function StorefrontPage() {
                 <Link href={`/products/${p.id}`} className="block overflow-hidden">
                   <div className="w-full h-64 relative">
                       <Image
-                          src={p.image_url || `https://placehold.co/400x400.png`}
+                          src={p.image_urls?.[0] || `https://placehold.co/400x400.png`}
                           alt={p.name}
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-300"

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -8,12 +7,13 @@ type Product = {
   name: string;
   description: string | null;
   price: number | null;
-  image_url: string | null;
+  image_urls: string[] | null;
   stock: number;
   sku: string;
 };
 
-type CartItem = Product & {
+type CartItem = Omit<Product, 'image_urls'> & {
+    image_url: string | null; // For cart display, we only need one image.
     quantity: number;
 }
 
@@ -60,7 +60,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
                         : item
                 );
             }
-            return [...prevItems, { ...product, quantity }];
+            
+            const { image_urls, ...restOfProduct } = product;
+
+            return [...prevItems, { 
+                ...restOfProduct, 
+                image_url: image_urls?.[0] || null, // Take first image for cart
+                quantity 
+            }];
         });
     };
 

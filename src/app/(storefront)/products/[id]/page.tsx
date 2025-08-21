@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useParams } from "next/navigation";
 import { useCart } from "@/context/cart-context";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 type Product = {
   id: string;
@@ -17,8 +17,31 @@ type Product = {
   sku: string;
   description: string | null;
   price: number | null;
-  image_url: string | null;
+  image_urls: string[] | null;
+  colors: string[] | null;
   stock: number;
+};
+
+// A simple utility to check if a string is a valid color.
+// This is basic and can be expanded.
+const isColor = (strColor: string) => {
+  const s = new Option().style;
+  s.color = strColor.toLowerCase();
+  return s.color !== '';
+};
+
+const ColorDisplay = ({ color }: { color: string }) => {
+    const colorStyle = isColor(color) ? color : 'grey';
+    return (
+        <div className="flex items-center gap-2">
+            <div 
+                className="h-6 w-6 rounded-full border" 
+                style={{ backgroundColor: colorStyle }}
+                title={color}
+            />
+            <span className="capitalize">{color}</span>
+        </div>
+    );
 };
 
 
@@ -38,7 +61,6 @@ export default function ProductDetailsPage() {
             const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
             if (error || !data) {
                 console.error(error);
-                // Optionally set an error state here to show a message to the user
             } else {
                 setProduct(data);
             }
@@ -77,17 +99,43 @@ export default function ProductDetailsPage() {
         });
     };
 
+    const hasImages = product.image_urls && product.image_urls.length > 0;
+
     return (
         <div className="container mx-auto p-4 md:p-8">
             <div className="grid md:grid-cols-2 gap-8 lg:gap-12 bg-card p-8 rounded-2xl shadow-lg border">
-                <div className="relative aspect-square">
-                    <Image 
-                        src={product.image_url || `https://placehold.co/600x600.png`}
-                        alt={product.name}
-                        fill
-                        className="object-cover w-full h-full rounded-xl"
-                        data-ai-hint="fashion clothing"
-                    />
+                <div className="relative">
+                   {hasImages ? (
+                        <Carousel className="w-full">
+                            <CarouselContent>
+                                {product.image_urls!.map((url, index) => (
+                                    <CarouselItem key={index}>
+                                        <div className="relative aspect-square">
+                                            <Image 
+                                                src={url}
+                                                alt={`${product.name} - صورة ${index + 1}`}
+                                                fill
+                                                className="object-cover w-full h-full rounded-xl"
+                                                data-ai-hint="fashion clothing"
+                                            />
+                                        </div>
+                                    </CarouselItem>
+                                ))}
+                            </CarouselContent>
+                            <CarouselPrevious className="-right-12" />
+                            <CarouselNext className="-left-12" />
+                        </Carousel>
+                    ) : (
+                        <div className="relative aspect-square">
+                            <Image 
+                                src={`https://placehold.co/600x600.png`}
+                                alt={product.name}
+                                fill
+                                className="object-cover w-full h-full rounded-xl"
+                                data-ai-hint="fashion clothing"
+                            />
+                        </div>
+                    )}
                 </div>
                 <div className="flex flex-col justify-center">
                     <p className="text-sm text-muted-foreground mb-2">SKU: {product.sku}</p>
@@ -102,6 +150,15 @@ export default function ProductDetailsPage() {
                     <div className="prose prose-lg text-muted-foreground mb-6 max-w-none">
                         <p>{product.description || "لا يوجد وصف تفصيلي لهذا المنتج حاليًا."}</p>
                     </div>
+
+                    {product.colors && product.colors.length > 0 && (
+                        <div className="mb-6">
+                            <h3 className="text-lg font-semibold mb-2">الألوان المتاحة:</h3>
+                            <div className="flex flex-wrap gap-x-4 gap-y-2">
+                                {product.colors.map(color => <ColorDisplay key={color} color={color} />)}
+                            </div>
+                        </div>
+                    )}
 
                     <div className="flex gap-4">
                         <Button size="lg" disabled={product.stock === 0} onClick={handleAddToCart} className="text-lg py-7 px-8">
