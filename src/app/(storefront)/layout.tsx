@@ -30,7 +30,7 @@ export default function StorefrontLayout({
       <main className="flex-grow">{children}</main>
       <footer className="bg-gray-900 text-gray-300 py-6 mt-10">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
-          <p>© {new Date().getFullYear()} Diamond Fashion. جميع الحقوق محفوظة.</p>
+          <p>© 2024 Diamond Fashion. جميع الحقوق محفوظة.</p>
           <div className="flex gap-4 mt-3 md:mt-0">
             <a href="#" className="hover:text-white transition">📘 فيسبوك</a>
             <a href="#" className="hover:text-white transition">📸 إنستجرام</a>
