@@ -1,7 +1,6 @@
 
 "use client";
 
-import { getSupabaseAdmin } from "@/lib/supabase-client";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { PackageCheck, ShoppingCart } from "lucide-react";
@@ -9,6 +8,7 @@ import { supabase } from "@/lib/supabase-client";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useParams } from "next/navigation";
 
 
 type Product = {
@@ -22,24 +22,29 @@ type Product = {
 };
 
 
-export default function ProductDetailsPage({ params }: { params: { id: string } }) {
+export default function ProductDetailsPage() {
+    const params = useParams();
+    const id = params.id as string;
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
 
     useEffect(() => {
+        if (!id) return;
+        
         async function fetchProduct() {
             setIsLoading(true);
-            const { data, error } = await supabase.from('products').select('*').eq('id', params.id).single();
+            const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
             if (error || !data) {
                 console.error(error);
+                // Optionally set an error state here to show a message to the user
             } else {
                 setProduct(data);
             }
             setIsLoading(false);
         }
         fetchProduct();
-    }, [params.id]);
+    }, [id]);
 
 
     if (isLoading) {
@@ -107,3 +112,4 @@ export default function ProductDetailsPage({ params }: { params: { id: string } 
         </div>
     );
 }
+
