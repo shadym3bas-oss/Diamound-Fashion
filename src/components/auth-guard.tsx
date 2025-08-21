@@ -18,12 +18,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
     const auth = localStorage.getItem("auth");
     
-    // Allow access to login page regardless of auth state
-    if (pathname.startsWith("/login")) {
-      setIsChecking(false);
-      return;
-    }
-    
     // If not authenticated, redirect to login
     if (auth !== "true") {
       router.replace("/login");
