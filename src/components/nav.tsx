@@ -1,4 +1,3 @@
-
 "use client"
 
 import Link from "next/link"
@@ -18,13 +17,13 @@ import { useSidebar } from "@/components/ui/sidebar";
 
 
 const links = [
-  { href: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard },
-  { href: "/orders", label: "الطلبات", icon: ShoppingCart },
-  { href: "/customers", label: "العملاء", icon: Users },
-  { href: "/products", label: "المنتجات", icon: Package },
-  { href: "/returns", label: "المرتجعات", icon: Undo2 },
-  { href: "/expenses", label: "المصروفات", icon: DollarSign },
-  { href: "/whatsapp", label: "رسائل واتساب", icon: MessageCircle },
+  { href: "/admin/dashboard", label: "لوحة التحكم", icon: LayoutDashboard },
+  { href: "/admin/orders", label: "الطلبات", icon: ShoppingCart },
+  { href: "/admin/customers", label: "العملاء", icon: Users },
+  { href: "/admin/products", label: "المنتجات", icon: Package },
+  { href: "/admin/returns", label: "المرتجعات", icon: Undo2 },
+  { href: "/admin/expenses", label: "المصروفات", icon: DollarSign },
+  { href: "/admin/whatsapp", label: "رسائل واتساب", icon: MessageCircle },
 ];
 
 
@@ -35,7 +34,7 @@ export function Nav() {
   return (
     <nav className="grid items-start p-3 space-y-1 text-sm font-medium">
         {links.map((link) => {
-            const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+            const isActive = pathname === link.href || (link.href !== "/admin/dashboard" && pathname.startsWith(link.href));
             return (
             <Link
               key={link.href}

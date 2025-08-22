@@ -1,4 +1,3 @@
-
 'use client';
 import { SidebarProvider, Sidebar, SidebarContent, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import Nav from '@/components/nav';
@@ -16,7 +15,7 @@ export default function DashboardLayout({
 
   const handleLogout = () => {
     localStorage.removeItem("auth");
-    router.push("/login");
+    router.push("/admin/login");
   };
 
   return (

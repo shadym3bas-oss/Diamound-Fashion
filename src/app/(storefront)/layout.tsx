@@ -38,7 +38,7 @@ function StorefrontHeader() {
             </Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/login">
+            <Link href="/admin/login">
               دخول المسؤول
             </Link>
           </Button>

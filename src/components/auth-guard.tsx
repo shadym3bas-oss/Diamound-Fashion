@@ -1,4 +1,3 @@
-
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
@@ -16,12 +15,18 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const auth = localStorage.getItem("auth");
-    
-    // If not authenticated, redirect to login
-    if (auth !== "true") {
-      router.replace("/login");
+    // Only protect routes under /admin
+    if (pathname.startsWith('/admin')) {
+      const auth = localStorage.getItem("auth");
+      
+      // If not authenticated, redirect to login
+      if (auth !== "true") {
+        router.replace("/admin/login");
+      } else {
+        setIsChecking(false);
+      }
     } else {
+      // Not an admin route, so no auth check needed
       setIsChecking(false);
     }
   }, [pathname, router]);

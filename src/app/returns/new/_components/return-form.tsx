@@ -110,7 +110,7 @@ export function ReturnForm({ orders }: ReturnFormProps) {
       toast({ variant: "destructive", title: "حدث خطأ", description: result.error });
     } else {
       toast({ title: "نجاح!", description: "تم تسجيل المرتجع بنجاح." });
-      router.push('/returns');
+      router.push('/admin/returns');
     }
   }
   

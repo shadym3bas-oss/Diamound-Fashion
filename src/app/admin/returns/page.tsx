@@ -1,4 +1,3 @@
-
 "use client";
 import { supabase } from "@/lib/supabase-client";
 import Link from "next/link";

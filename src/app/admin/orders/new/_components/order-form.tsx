@@ -1,4 +1,3 @@
-
 "use client";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,8 +21,8 @@ import { Loader2, PlusCircle, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CustomerForm } from "@/app/(admin)/customers/new/_components/customer-form";
-import { ProductForm } from "@/app/(admin)/products/new/_components/product-form";
+import { CustomerForm } from "@/app/admin/customers/new/_components/customer-form";
+import { ProductForm } from "@/app/admin/products/new/_components/product-form";
 import { useRouter } from "next/navigation";
 
 
